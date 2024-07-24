@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: boardgame
-          image: himalaya7087:java-image # Image that will be used to containers in the cluster
+          image: $ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/$ECR_REPO:$IMAGE_TAG # Image that will be used to containers in the cluster
           imagePullPolicy: Always
           ports:
             - containerPort: 8080 # The port that the container is running on in the cluster
