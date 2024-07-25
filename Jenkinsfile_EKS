@@ -1,0 +1,32 @@
+// make a new pipeline in case of deploying with eks cluster
+// used for deleting resources provisioned by ingress file(load-balancer)
+pipeline{
+    agent any
+    
+    stages{
+        stage("Clean Workspace"){
+            steps{
+                cleanWs()
+            }
+        }
+        
+         stage("Code Checkout"){
+            steps{
+                git credentialsId: '9e561c85-406b-4f5a-ba0d-fe4e74733729', url: 'https://github.com/Himalaya7087/BoardGame-Project', branch: 'main'
+            }
+        }
+        
+        stage("delete deployment"){
+            steps{
+                dir("deployment"){
+                    sh """
+                        
+                        kubectl delete -f deployment.yaml
+                        kubectl delete -f service.yaml
+                        kubectl delete -f ingress.yaml
+                    """
+                }
+            }
+        }
+    }
+}

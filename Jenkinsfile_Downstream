@@ -1,0 +1,67 @@
+// make a new pipeline in case of deploying with argocd  
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'NEW_IMAGE_TAG', description: 'New image tag to update in Kubernetes deployment file')
+    }
+
+    environment {
+        GIT_REPO_URL1 = 'https://github.com/Himalaya7087/Boardgame-Deployment'
+        GIT_REPO_URL2 = 'github.com/Himalaya7087/Boardgame-Deployment'
+        GIT_BRANCH = 'main'
+        DEPLOYMENT_FILE = 'deployment.yaml' 
+        GIT_USER = credentials('9e561c85-406b-4f5a-ba0d-fe4e74733729') 
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Clean workspace before checkout (optional)
+                    deleteDir()
+                    
+                    // Checkout repository
+                    checkout([$class: 'GitSCM', branches: [[name: "${GIT_BRANCH}"]], userRemoteConfigs: [[url: "${GIT_REPO_URL1}"]], credentialsId: "${GIT_USER}"])
+                }
+            }
+        }
+
+         stage('Update Image Tag') {
+            steps {
+                dir("Boardgame-Deployment"){
+                    sh"""
+                    sed -i.bak "s/image:.*/image: 533267043749.dkr.ecr.ap-south-1.amazonaws.com\\/himalaya7087:${NEW_IMAGE_TAG}/g" ${DEPLOYMENT_FILE}
+                    rm -rf *.bak
+                    """        
+                }
+            }
+        }
+
+        stage('Commit and Push Changes') {
+            steps {
+                script {
+                    // Commit changes
+                    sh """
+                    git checkout ${GIT_BRANCH}
+                    git add .
+                    git commit -m "Updated image tag to ${NEW_IMAGE_TAG}"
+                    """
+                    
+                    withCredentials([usernamePassword(credentialsId: '9e561c85-406b-4f5a-ba0d-fe4e74733729', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "git push https://${USERNAME}:${PASSWORD}@${env.GIT_REPO_URL2}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed :('
+        }
+    }
+}
