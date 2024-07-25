@@ -92,22 +92,22 @@ pipeline{
                 """
             }
         }
-         stage('Deploy to EKS') {
-            steps {
-                dir("deployment"){
-                    sh """
-                       aws eks update-kubeconfig --name mbp-eks
-                        envsubst < ./deployment.yaml.tmpl > deployment.yaml
-                        envsubst < ./service.yaml.tmpl > service.yaml
-                        envsubst < ./ingress.yaml.tmpl > ingress.yaml
+        //  stage('Deploy to EKS') {
+        //     steps {
+        //         dir("deployment"){
+        //             sh """
+        //                aws eks update-kubeconfig --name mbp-eks
+        //                 envsubst < ./deployment.yaml.tmpl > deployment.yaml
+        //                 envsubst < ./service.yaml.tmpl > service.yaml
+        //                 envsubst < ./ingress.yaml.tmpl > ingress.yaml
                         
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
-                        kubectl apply -f ingress.yaml
-                    """
-                }
-            }
-        }
+        //                 kubectl apply -f deployment.yaml
+        //                 kubectl apply -f service.yaml
+        //                 kubectl apply -f ingress.yaml
+        //             """
+        //         }
+        //     }
+        // }
         
     }
 }
