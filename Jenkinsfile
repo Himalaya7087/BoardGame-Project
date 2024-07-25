@@ -109,7 +109,7 @@ pipeline{
         //     }
         // }
 
-        stage("Update New Image in Git Repo"){
+        stage("Update New Image in Git Repo for ArgoCD"){
             steps{
                 build(job: "Deploy-Boardgame-ArgoCD", parameters: [
                     string(name: 'NEW_IMAGE_TAG', value: "${env.IMAGE_TAG}")
