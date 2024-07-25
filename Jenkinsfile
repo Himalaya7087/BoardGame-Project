@@ -96,6 +96,7 @@ pipeline{
             steps {
                 dir("deployment"){
                     sh """
+                       aws eks update-kubeconfig --name mbp-eks
                         envsubst < ./deployment.yaml.tmpl > deployment.yaml
                         envsubst < ./service.yaml.tmpl > service.yaml
                         envsubst < ./ingress.yaml.tmpl > ingress.yaml
