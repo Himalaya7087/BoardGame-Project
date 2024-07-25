@@ -40,25 +40,25 @@ pipeline{
         //     }
         // }
         
-        // stage("Sonarqube Analysis"){
-        //     tools{
-        //         jdk "openjdk17"
-        //     }
-        //     steps{
-        //         withSonarQubeEnv('sonarqube-scanner') {
-        //             sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=boardgame -Dsonar.java.binaries=. -Dsonar.projectKey=boardgame "
-        //         }
-        //     }
-        // }
+        stage("Sonarqube Analysis"){
+            tools{
+                jdk "openjdk17"
+            }
+            steps{
+                withSonarQubeEnv('sonarqube-scanner') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=boardgame -Dsonar.java.binaries=. -Dsonar.projectKey=boardgame "
+                }
+            }
+        }
         
-        // stage("Source Code Scan"){
-        //     steps{
-        //         sh"""
-        //           export PATH=/usr/local/bin:$PATH
-        //           trivy fs --format table -o trivy-scan-report.html .
-        //         """
-        //     }
-        // }
+        stage("Source Code Scan"){
+            steps{
+                sh"""
+                  export PATH=/usr/local/bin:$PATH
+                  trivy fs --format table -o trivy-scan-report.html .
+                """
+            }
+        }
         
         // stage("Build Artifact"){
         //     steps{
@@ -108,6 +108,14 @@ pipeline{
         //         }
         //     }
         // }
+
+        stage("Update New Image in Git Repo"){
+            steps{
+                build(job: "Deploy-Boardgame-ArgoCD", parameters: [
+                    string(name: 'NEW_IMAGE_TAG', value: "${env.IMAGE_TAG}")
+                ])
+            }
+        }
         
     }
 }
